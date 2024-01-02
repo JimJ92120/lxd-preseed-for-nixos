@@ -11,6 +11,7 @@ This comes in handy:
 
 `./lxd-preseed.yaml` translates all `.nix` configurations declared into "standard" `.yaml` format.
 
+The following will be setup through the example:  
 ![lxd-in-nixos](https://github.com/JimJ92120/lxd-preseed-for-nixos/assets/57893611/1c005450-16cd-4dd5-8b08-613713f85543)  
 
 ### important note
