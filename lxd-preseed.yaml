@@ -1,0 +1,82 @@
+config:
+  images.auto_update_interval: "0"
+networks:
+  # default
+  - name: lxdBrDefault
+    type: bridge
+    config:
+      ipv4.address: 10.100.1.1/8
+      ipv4.nat: "true"
+
+  # dev
+  - name: lxdBrDev
+    type: bridge
+    config:
+      ipv4.address: 10.10.1.1/16
+      ipv4.nat: "true"
+
+  # private 0
+  - name: lxdBrPrivate0
+    type: bridge
+    config:
+      ipv4.address: 10.110.1.1/16
+      ipv4.nat: "true"
+
+storage_pools:
+  # default
+  # /var/lib/lxd/storage-pools/default
+  - name: default
+    driver: dir
+
+  # dev
+  # /var/lib/lxd/storage-pools/dev
+  - name: dev
+    driver: dir
+
+  # private 0
+  # /var/lib/lxd/storage-pools/private0
+  - name: private0
+    driver: dir
+
+profiles:
+  # default
+  - name: default
+    devices:
+      eth0:
+        name: eth0
+        nictype: bridged
+        parent: lxdBrDefault
+        type: nic
+      root:
+        path: /
+        pool: default
+        size: 16GiB
+        type: disk
+
+  # dev
+  - name: default
+    devices:
+      eth0:
+        name: eth0
+        nictype: bridged
+        parent: lxdBrDev
+        type: nic
+      root:
+        path: /
+        pool: dev
+        size: 16GiB
+        type: disk
+
+  # private 0
+  - name: private0
+    devices:
+      eth0:
+        name: eth0
+        nictype: bridged
+        parent: lxdBrPrivate0
+        type: nic
+      root:
+        path: /
+        pool: dev
+        size: 24GiB
+        type: disk
