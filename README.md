@@ -11,6 +11,25 @@ This comes in handy:
 
 `./lxd-preseed.yaml` translates all `.nix` configurations declared into "standard" `.yaml` format.
 
+### important note
+
+If attempting to **add OR edit** such configuration to an existing **NixOS** host with **LXD** already configured and running, this may cause conflicts.  
+"Easiest" is to:
+
+1. disable `lxd` from `configuration.nix`
+
+   ```nix
+   {
+    virtualisation.lxd.enabled = false;
+
+    # and comment all previous `lxd` related configurations
+   }
+   ```
+
+2. rebuild with `nixos-rebuild switch` ADN `nixos-rebuild boot`
+3. reboot
+4. re-enable `lxd` with new configurations
+
 ---
 
 ---
@@ -43,6 +62,12 @@ Example is setup to run separated networks (bridges) as followed:
 
 (subnetting may be tweaked here)
 
+To view all existing `lxd` networks:
+
+```sh
+lxd network list
+```
+
 #### example convention
 
 (to confirm)
@@ -57,6 +82,11 @@ Example is setup to run separated networks (bridges) as followed:
 |         |                         |                     |              |
 | private | 10.110.x.x - 10.190.x.x | 255.255.0.0 (16)    | 10.110.1.10  |
 |         |                         |                     | 10.150.1.10  |
+
+### storage
+
+Similar to **networking**, each **profile** declares a dedicated `storage_pool`.  
+The default location would be `/var/lib/lxd/storage-pools/${STORAGE_NAME}`.
 
 ---
 
@@ -109,6 +139,12 @@ Then rebuild:
 sudo nixos-rebuild switch
 ```
 
+Verify if **storages**, **networks** and `lxd` **profiles** have been added correctly:
+
+```sh
+lxc network list && lxc storage list && lxc profile list
+```
+
 ### add / edit **profiles**
 
 **profiles** are located in `./lxd/profiles` (or `/etc/nixos/lxd/profiles` if already copied).
@@ -155,17 +191,85 @@ in
 }
 ```
 
+### networking
+
+Additional netowrking configuration may be required (e.g forwarding, subnetting, etc).
+
+To assign IP's (`ipv4`), following must be added to `./lxd/lxd-networking.nix` for each network:
+
+```nix
+networking.firewall.extraCommands = ''
+  iptables -A INPUT -i ${NETWORK_NAME} -m comment --comment "lxd rule for ${NETWORK_NAME}" -j ACCEPT
+'';
+```
+
+The default `eth0` device is used to bridge declared networked in `./lxd/profiles/${PROFILE_NAME}.nix`.  
+This may be changed to another device though will require additional network configuration.
+
 ---
 
 ---
 
 # containers
 
-### run with profile
+Defined **profiles** (as declaring `lxd` **profiles**) may then be used and refered to using the `--profile` flag.
 
-(tbd)
+### examples
+
+A container may be created such as:
+
+```sh
+# profile:  default
+# image:    ubuntu 22.04 server
+lxc launch images:ubuntu/22.04 ubuntu-default --profile default
+
+# profile:  dev
+# image:    ubuntu 22.04 server
+lxc launch images:ubuntu/22.04 ubuntu-dev --profile dev
+
+# profile:  private0
+# image:    ubuntu 22.04 server
+lxc launch images:ubuntu/22.04 ubuntu-private0 --profile private0
+```
 
 ---
+
+---
+
+# some useful commands
+
+```sh
+# view all containers
+lxc list
+
+# view a container config
+lxc config show $CONTAINER_NAME --expanded
+
+# start / stop a container
+lxc start $CONTAINER_NAME
+lxc stop $CONTAINER_NAME
+
+# delete a container
+lxc delete $CONTAINER_NAME
+
+# multiple containers are supported within a command (`start`, `stop`, ...)
+lxc start $CONTAINER_1_NAME $CONTAINER_2_NAME ...
+
+#####
+
+# list all networks
+lxc network list
+
+# list all storages
+lxc storage list
+
+# list all profiles
+lxc profile list
+
+###
+# or all at once
+lxc network list && lxc storage list && lxc profile list # && lxc list
+```
 
 ---
 
