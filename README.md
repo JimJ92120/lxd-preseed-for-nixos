@@ -59,7 +59,7 @@ Example is setup to run separated networks (bridges) as followed:
 
 | profile    | interface       | gateway    | subnet mask       |
 | ---------- | --------------- | ---------- | ----------------- |
-| `default`  | lxdBrDefault    | 10.100.1.1 | 255.255.255.0 (8) |
+| `default`  | `lxdBrDefault`  | 10.100.1.1 | 255.255.255.0 (8) |
 | `dev`      | `lxdBrDev`      | 10.10.1.1  | 255.255.0.0 (16)  |
 | `private0` | `lxdBrPrivate0` | 10.110.1.1 | 255.255.0.0 (16)  |
 
@@ -84,7 +84,7 @@ lxd network list
 |         |                         |                     | 10.10.100.10 |
 |         |                         |                     |              |
 | private | 10.110.x.x - 10.190.x.x | 255.255.0.0 (16)    | 10.110.1.10  |
-|         |                         |                     | 10.150.1.10  |
+|         |                         |                     | 10.110.10.10 |
 
 ### storage
 
