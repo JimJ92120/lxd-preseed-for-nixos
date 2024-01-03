@@ -1,4 +1,4 @@
-# lxd-in-nixos
+# lxd-preseed-for-nixos
 
 A `preseed(ed)` configuration for `lxd` in a `nixos` host, to **declare** any `lxd` options and configurations.
 
